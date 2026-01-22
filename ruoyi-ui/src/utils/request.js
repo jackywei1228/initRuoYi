@@ -1,4 +1,5 @@
 import axios from 'axios'
+import Cookies from 'js-cookie'
 import { Notification, MessageBox, Message, Loading } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
@@ -22,6 +23,11 @@ const service = axios.create({
 
 // request拦截器
 service.interceptors.request.use(config => {
+  const language = Cookies.get('language')
+  if (language) {
+    config.params = { ...(config.params || {}), lang: language }
+    config.headers['Accept-Language'] = language === 'en' ? 'en-US' : 'zh-CN'
+  }
   // 是否需要设置 token
   const isToken = (config.headers || {}).isToken === false
   // 是否需要防止数据重复提交

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysI18nMapper">
+
+    <resultMap id="SysI18nResult" type="SysI18n">
+        <id property="i18nId" column="i18n_id" />
+        <result property="i18nKey" column="i18n_key" />
+        <result property="lang" column="lang" />
+        <result property="i18nValue" column="i18n_value" />
+        <result property="module" column="module" />
+        <result property="status" column="status" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <select id="selectI18nByLang" resultMap="SysI18nResult">
+        select i18n_id, i18n_key, lang, i18n_value, module, status, create_by, create_time, update_by, update_time, remark
+        from sys_i18n
+        where lang = #{lang}
+        <if test="status != null and status != ''">
+            and status = #{status}
+        </if>
+        order by i18n_id
+    </select>
+</mapper>

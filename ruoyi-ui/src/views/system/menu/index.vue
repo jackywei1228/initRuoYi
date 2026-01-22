@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
-      <el-form-item label="菜单名称" prop="menuName">
+      <el-form-item :label="menuNameLabel" prop="menuName">
         <el-input
           v-model="queryParams.menuName"
-          placeholder="请输入菜单名称"
+          :placeholder="menuNamePlaceholder"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -20,8 +20,8 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">{{ $t('common.search') }}</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">{{ $t('common.reset') }}</el-button>
       </el-form-item>
     </el-form>
 
@@ -34,7 +34,7 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['system:menu:add']"
-        >新增</el-button>
+        >{{ $t('common.add') }}</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -43,7 +43,7 @@
           icon="el-icon-sort"
           size="mini"
           @click="toggleExpandAll"
-        >展开/折叠</el-button>
+        >{{ $t('common.expandCollapse') }}</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
@@ -56,7 +56,11 @@
       :default-expand-all="isExpandAll"
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
     >
-      <el-table-column prop="menuName" label="菜单名称" :show-overflow-tooltip="true" width="160"></el-table-column>
+      <el-table-column :label="menuNameLabel" :show-overflow-tooltip="true" width="180">
+        <template slot-scope="scope">
+          {{ displayMenuName(scope.row) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="icon" label="图标" align="center" width="100">
         <template slot-scope="scope">
           <svg-icon :icon-class="scope.row.icon" />
@@ -65,17 +69,17 @@
       <el-table-column prop="orderNum" label="排序" width="60"></el-table-column>
       <el-table-column prop="perms" label="权限标识" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column prop="component" label="组件路径" :show-overflow-tooltip="true"></el-table-column>
-      <el-table-column prop="status" label="状态" width="80">
+      <el-table-column prop="status" :label="$t('common.status')" width="80">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.status"/>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime">
+      <el-table-column :label="$t('common.createTime')" align="center" prop="createTime">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column :label="$t('common.operation')" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -83,21 +87,21 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['system:menu:edit']"
-          >修改</el-button>
+          >{{ $t('common.edit') }}</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-plus"
             @click="handleAdd(scope.row)"
             v-hasPermi="['system:menu:add']"
-          >新增</el-button>
+          >{{ $t('common.add') }}</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['system:menu:remove']"
-          >删除</el-button>
+          >{{ $t('common.delete') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -159,8 +163,13 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="菜单名称" prop="menuName">
-              <el-input v-model="form.menuName" placeholder="请输入菜单名称" />
+            <el-form-item :label="menuNameLabel" prop="menuName">
+              <el-input v-model="form.menuName" :placeholder="menuNamePlaceholder" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="menuNameEnLabel" prop="menuNameEn">
+              <el-input v-model="form.menuNameEn" :placeholder="menuNameEnPlaceholder" />
             </el-form-item>
           </el-col>
           <el-col :span="12" v-if="form.menuType == 'C'">
@@ -308,6 +317,20 @@ export default {
   name: "Menu",
   dicts: ['sys_show_hide', 'sys_normal_disable'],
   components: { Treeselect, IconSelect },
+  computed: {
+    menuNameLabel() {
+      return this.$i18n && this.$i18n.locale === 'en' ? 'Menu Name' : '菜单名称'
+    },
+    menuNamePlaceholder() {
+      return this.$i18n && this.$i18n.locale === 'en' ? 'Enter menu name' : '请输入菜单名称'
+    },
+    menuNameEnLabel() {
+      return this.$i18n && this.$i18n.locale === 'en' ? 'Menu Name (EN)' : '菜单英文名称'
+    },
+    menuNameEnPlaceholder() {
+      return this.$i18n && this.$i18n.locale === 'en' ? 'Enter English name' : '请输入菜单英文名称'
+    }
+  },
   data() {
     return {
       // 遮罩层
@@ -355,6 +378,12 @@ export default {
     selected(name) {
       this.form.icon = name
     },
+    displayMenuName(row) {
+      if (this.$i18n && this.$i18n.locale === 'en' && row.menuNameEn) {
+        return row.menuNameEn
+      }
+      return row.menuName
+    },
     /** 查询菜单列表 */
     getList() {
       this.loading = true
@@ -370,7 +399,7 @@ export default {
       }
       return {
         id: node.menuId,
-        label: node.menuName,
+        label: this.displayMenuName(node),
         children: node.children
       }
     },
@@ -378,7 +407,8 @@ export default {
     getTreeselect() {
       listMenu().then(response => {
         this.menuOptions = []
-        const menu = { menuId: 0, menuName: '主类目', children: [] }
+        const menuName = this.$i18n && this.$i18n.locale === 'en' ? 'Root' : '主类目'
+        const menu = { menuId: 0, menuName, children: [] }
         menu.children = this.handleTree(response.data, "menuId")
         this.menuOptions.push(menu)
       })
@@ -394,6 +424,7 @@ export default {
         menuId: undefined,
         parentId: 0,
         menuName: undefined,
+        menuNameEn: undefined,
         icon: undefined,
         menuType: "M",
         orderNum: undefined,

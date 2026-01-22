@@ -3,6 +3,7 @@ import Vue from 'vue'
 import Cookies from 'js-cookie'
 
 import Element from 'element-ui'
+import locale from 'element-ui/lib/locale'
 import './assets/styles/element-variables.scss'
 
 import '@/assets/styles/index.scss' // global css
@@ -10,6 +11,7 @@ import '@/assets/styles/ruoyi.scss' // ruoyi css
 import App from './App'
 import store from './store'
 import router from './router'
+import i18n, { loadLocaleMessages } from './lang'
 import directive from './directive' // directive
 import plugins from './plugins' // plugins
 import { download } from '@/utils/request'
@@ -72,12 +74,16 @@ DictData.install()
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium' // set element-ui default size
 })
+locale.i18n((key, value) => i18n.t(key, value))
 
 Vue.config.productionTip = false
 
-new Vue({
-  el: '#app',
-  router,
-  store,
-  render: h => h(App)
+loadLocaleMessages(i18n.locale).finally(() => {
+  new Vue({
+    el: '#app',
+    i18n,
+    router,
+    store,
+    render: h => h(App)
+  })
 })

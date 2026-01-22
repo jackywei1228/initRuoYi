@@ -24,6 +24,9 @@ public class SysMenu extends BaseEntity
     /** 菜单名称 */
     private String menuName;
 
+    /** 菜单英文名称 */
+    private String menuNameEn;
+
     /** 父菜单名称 */
     private String parentName;
 
@@ -89,6 +92,17 @@ public class SysMenu extends BaseEntity
     public void setMenuName(String menuName)
     {
         this.menuName = menuName;
+    }
+
+    @Size(min = 0, max = 50, message = "菜单英文名称长度不能超过50个字符")
+    public String getMenuNameEn()
+    {
+        return menuNameEn;
+    }
+
+    public void setMenuNameEn(String menuNameEn)
+    {
+        this.menuNameEn = menuNameEn;
     }
 
     public String getParentName()
@@ -251,6 +265,7 @@ public class SysMenu extends BaseEntity
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("menuId", getMenuId())
             .append("menuName", getMenuName())
+            .append("menuNameEn", getMenuNameEn())
             .append("parentId", getParentId())
             .append("orderNum", getOrderNum())
             .append("path", getPath())
