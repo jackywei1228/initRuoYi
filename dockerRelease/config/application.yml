@@ -1,0 +1,6 @@
+ruoyi:
+  profile: /data/ruoyi/uploadPath
+
+spring:
+  profiles:
+    active: druid

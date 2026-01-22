@@ -45,3 +45,7 @@ nbdist/
 !*/build/*.java
 !*/build/*.html
 !*/build/*.xml
+
+dockerRelease/mysql/data/*
+dockerRelease/mysql/data
+dockerRelease/ruoyi-admin.jar
