@@ -49,3 +49,4 @@ nbdist/
 dockerRelease/mysql/data/*
 dockerRelease/mysql/data
 dockerRelease/ruoyi-admin.jar
+ruoyi-admin.jar
