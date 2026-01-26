@@ -1,0 +1,60 @@
+.ruoyi-layout {
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+
+.ruoyi-sider {
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+}
+
+.ruoyi-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 18px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.ruoyi-logo img {
+  width: 28px;
+  height: 28px;
+}
+
+.ruoyi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.ruoyi-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 16px;
+}
+
+.ruoyi-breadcrumb {
+  margin-left: 8px;
+}
+
+.ruoyi-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.ruoyi-user {
+  cursor: pointer;
+}
+
+.ruoyi-content {
+  margin: 24px;
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+  min-height: calc(100vh - 120px);
+}
