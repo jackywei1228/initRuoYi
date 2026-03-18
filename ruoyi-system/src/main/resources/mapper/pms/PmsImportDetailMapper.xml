@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.pms.mapper.PmsImportDetailMapper">
+
+    <resultMap type="com.ruoyi.system.pms.domain.PmsImportDetail" id="PmsImportDetailResult">
+        <id     property="detailId"      column="detail_id"      />
+        <result property="recordId"      column="record_id"      />
+        <result property="rowNumber"     column="row_number"     />
+        <result property="rawData"       column="raw_data"       />
+        <result property="parsedData"    column="parsed_data"    />
+        <result property="verifyStatus"  column="verify_status"  />
+        <result property="verifyRemark"  column="verify_remark"  />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectImportDetailVo">
+        select detail_id, record_id, row_number, raw_data, parsed_data, verify_status, verify_remark, create_time
+        from pms_import_detail
+    </sql>
+
+    <select id="selectImportDetailById" parameterType="Long" resultMap="PmsImportDetailResult">
+        <include refid="selectImportDetailVo"/>
+        where detail_id = #{detailId}
+    </select>
+
+    <select id="selectImportDetailList" parameterType="com.ruoyi.system.pms.domain.PmsImportDetail" resultMap="PmsImportDetailResult">
+        <include refid="selectImportDetailVo"/>
+        <where>
+            <if test="recordId != null">
+                AND record_id = #{recordId}
+            </if>
+            <if test="verifyStatus != null and verifyStatus != ''">
+                AND verify_status = #{verifyStatus}
+            </if>
+        </where>
+        order by row_number
+    </select>
+
+    <select id="selectByRecordId" parameterType="Long" resultMap="PmsImportDetailResult">
+        <include refid="selectImportDetailVo"/>
+        where record_id = #{recordId}
+        order by row_number
+    </select>
+
+    <insert id="insertImportDetail" parameterType="com.ruoyi.system.pms.domain.PmsImportDetail" useGeneratedKeys="true" keyProperty="detailId">
+        insert into pms_import_detail (
+            <if test="recordId != null">record_id,</if>
+            <if test="rowNumber != null">row_number,</if>
+            <if test="rawData != null and rawData != ''">raw_data,</if>
+            <if test="parsedData != null and parsedData != ''">parsed_data,</if>
+            <if test="verifyStatus != null and verifyStatus != ''">verify_status,</if>
+            <if test="verifyRemark != null and verifyRemark != ''">verify_remark,</if>
+            create_time
+        ) values (
+            <if test="recordId != null">#{recordId},</if>
+            <if test="rowNumber != null">#{rowNumber},</if>
+            <if test="rawData != null and rawData != ''">#{rawData},</if>
+            <if test="parsedData != null and parsedData != ''">#{parsedData},</if>
+            <if test="verifyStatus != null and verifyStatus != ''">#{verifyStatus},</if>
+            <if test="verifyRemark != null and verifyRemark != ''">#{verifyRemark},</if>
+            sysdate()
+        )
+    </insert>
+
+    <insert id="batchInsertImportDetail" parameterType="java.util.List">
+        insert into pms_import_detail (record_id, row_number, raw_data, parsed_data, verify_status, verify_remark, create_time) values
+        <foreach item="item" collection="list" separator=",">
+            (#{item.recordId}, #{item.rowNumber}, #{item.rawData}, #{item.parsedData}, #{item.verifyStatus}, #{item.verifyRemark}, sysdate())
+        </foreach>
+    </insert>
+
+    <update id="updateImportDetail" parameterType="com.ruoyi.system.pms.domain.PmsImportDetail">
+        update pms_import_detail
+        <set>
+            <if test="recordId != null">record_id = #{recordId},</if>
+            <if test="rowNumber != null">row_number = #{rowNumber},</if>
+            <if test="rawData != null and rawData != ''">raw_data = #{rawData},</if>
+            <if test="parsedData != null and parsedData != ''">parsed_data = #{parsedData},</if>
+            <if test="verifyStatus != null and verifyStatus != ''">verify_status = #{verifyStatus},</if>
+            <if test="verifyRemark != null and verifyRemark != ''">verify_remark = #{verifyRemark},</if>
+        </set>
+        where detail_id = #{detailId}
+    </update>
+
+    <delete id="deleteImportDetailById" parameterType="Long">
+        delete from pms_import_detail where detail_id = #{detailId}
+    </delete>
+
+    <delete id="deleteByRecordId" parameterType="Long">
+        delete from pms_import_detail where record_id = #{recordId}
+    </delete>
+
+    <delete id="deleteImportDetailByIds" parameterType="Long">
+        delete from pms_import_detail where detail_id in
+        <foreach item="detailId" collection="array" open="(" separator="," close=")">
+            #{detailId}
+        </foreach>
+    </delete>
+
+</mapper>

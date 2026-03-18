@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.pms.mapper.PmsExchangeRateMapper">
+
+    <resultMap type="com.ruoyi.system.pms.domain.PmsExchangeRate" id="PmsExchangeRateResult">
+        <id     property="rateId"         column="rate_id"         />
+        <result property="currencyPair"   column="currency_pair"   />
+        <result property="rateValue"      column="rate_value"      />
+        <result property="effectiveDate"  column="effective_date"  />
+        <result property="isActive"       column="is_active"       />
+        <result property="createBy"       column="create_by"       />
+        <result property="createTime"     column="create_time"     />
+        <result property="remark"         column="remark"          />
+    </resultMap>
+
+    <sql id="selectExchangeRateVo">
+        select rate_id, currency_pair, rate_value, effective_date, is_active, create_by, create_time, remark
+        from pms_exchange_rate
+    </sql>
+
+    <select id="selectExchangeRateById" parameterType="Long" resultMap="PmsExchangeRateResult">
+        <include refid="selectExchangeRateVo"/>
+        where rate_id = #{rateId}
+    </select>
+
+    <select id="selectExchangeRateList" parameterType="com.ruoyi.system.pms.domain.PmsExchangeRate" resultMap="PmsExchangeRateResult">
+        <include refid="selectExchangeRateVo"/>
+        <where>
+            <if test="currencyPair != null and currencyPair != ''">
+                AND currency_pair = #{currencyPair}
+            </if>
+            <if test="isActive != null and isActive != ''">
+                AND is_active = #{isActive}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''">
+                AND date_format(effective_date,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                AND date_format(effective_date,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+            </if>
+        </where>
+        order by effective_date desc
+    </select>
+
+    <select id="selectLatestRate" parameterType="String" resultMap="PmsExchangeRateResult">
+        <include refid="selectExchangeRateVo"/>
+        where currency_pair = #{currencyPair} and is_active = '1'
+        order by effective_date desc
+        limit 1
+    </select>
+
+    <select id="selectHistoryRates" resultMap="PmsExchangeRateResult">
+        <include refid="selectExchangeRateVo"/>
+        where currency_pair = #{currencyPair}
+        <if test="startDate != null">
+            AND effective_date &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND effective_date &lt;= #{endDate}
+        </if>
+        order by effective_date desc
+    </select>
+
+    <insert id="insertExchangeRate" parameterType="com.ruoyi.system.pms.domain.PmsExchangeRate" useGeneratedKeys="true" keyProperty="rateId">
+        insert into pms_exchange_rate (
+            <if test="currencyPair != null and currencyPair != ''">currency_pair,</if>
+            <if test="rateValue != null">rate_value,</if>
+            <if test="effectiveDate != null">effective_date,</if>
+            <if test="isActive != null and isActive != ''">is_active,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        ) values (
+            <if test="currencyPair != null and currencyPair != ''">#{currencyPair},</if>
+            <if test="rateValue != null">#{rateValue},</if>
+            <if test="effectiveDate != null">#{effectiveDate},</if>
+            <if test="isActive != null and isActive != ''">#{isActive},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateExchangeRate" parameterType="com.ruoyi.system.pms.domain.PmsExchangeRate">
+        update pms_exchange_rate
+        <set>
+            <if test="currencyPair != null and currencyPair != ''">currency_pair = #{currencyPair},</if>
+            <if test="rateValue != null">rate_value = #{rateValue},</if>
+            <if test="effectiveDate != null">effective_date = #{effectiveDate},</if>
+            <if test="isActive != null and isActive != ''">is_active = #{isActive},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where rate_id = #{rateId}
+    </update>
+
+    <delete id="deleteExchangeRateById" parameterType="Long">
+        delete from pms_exchange_rate where rate_id = #{rateId}
+    </delete>
+
+    <delete id="deleteExchangeRateByIds" parameterType="Long">
+        delete from pms_exchange_rate where rate_id in
+        <foreach item="rateId" collection="array" open="(" separator="," close=")">
+            #{rateId}
+        </foreach>
+    </delete>
+
+</mapper>

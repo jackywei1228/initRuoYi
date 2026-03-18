@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.pms.mapper.PmsBareboneAccessoryMapper">
+
+    <resultMap type="com.ruoyi.system.pms.domain.PmsBareboneAccessory" id="PmsBareboneAccessoryResult">
+        <id     property="id"                 column="id"                  />
+        <result property="bareboneId"         column="barebone_id"         />
+        <result property="accessoryTypeId"    column="accessory_type_id"   />
+        <result property="accessoryValueId"   column="accessory_value_id"  />
+        <result property="isDefault"          column="is_default"          />
+    </resultMap>
+
+    <sql id="selectBareboneAccessoryVo">
+        select id, barebone_id, accessory_type_id, accessory_value_id, is_default
+        from pms_barebone_accessory
+    </sql>
+
+    <select id="selectBareboneAccessoryById" parameterType="Long" resultMap="PmsBareboneAccessoryResult">
+        <include refid="selectBareboneAccessoryVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectBareboneAccessoryList" parameterType="com.ruoyi.system.pms.domain.PmsBareboneAccessory" resultMap="PmsBareboneAccessoryResult">
+        <include refid="selectBareboneAccessoryVo"/>
+        <where>
+            <if test="bareboneId != null">
+                AND barebone_id = #{bareboneId}
+            </if>
+            <if test="accessoryTypeId != null">
+                AND accessory_type_id = #{accessoryTypeId}
+            </if>
+            <if test="accessoryValueId != null">
+                AND accessory_value_id = #{accessoryValueId}
+            </if>
+            <if test="isDefault != null and isDefault != ''">
+                AND is_default = #{isDefault}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByBareboneId" parameterType="Long" resultMap="PmsBareboneAccessoryResult">
+        <include refid="selectBareboneAccessoryVo"/>
+        where barebone_id = #{bareboneId}
+    </select>
+
+    <insert id="insertBareboneAccessory" parameterType="com.ruoyi.system.pms.domain.PmsBareboneAccessory" useGeneratedKeys="true" keyProperty="id">
+        insert into pms_barebone_accessory (
+            barebone_id,
+            accessory_type_id,
+            accessory_value_id,
+            <if test="isDefault != null and isDefault != ''">is_default,</if>
+            id
+        ) values (
+            #{bareboneId},
+            #{accessoryTypeId},
+            #{accessoryValueId},
+            <if test="isDefault != null and isDefault != ''">#{isDefault},</if>
+            id
+        )
+    </insert>
+
+    <insert id="batchInsertBareboneAccessory" parameterType="java.util.List">
+        insert into pms_barebone_accessory (barebone_id, accessory_type_id, accessory_value_id, is_default) values
+        <foreach item="item" collection="list" separator=",">
+            (#{item.bareboneId}, #{item.accessoryTypeId}, #{item.accessoryValueId}, #{item.isDefault})
+        </foreach>
+    </insert>
+
+    <update id="updateBareboneAccessory" parameterType="com.ruoyi.system.pms.domain.PmsBareboneAccessory">
+        update pms_barebone_accessory
+        <set>
+            <if test="bareboneId != null">barebone_id = #{bareboneId},</if>
+            <if test="accessoryTypeId != null">accessory_type_id = #{accessoryTypeId},</if>
+            <if test="accessoryValueId != null">accessory_value_id = #{accessoryValueId},</if>
+            <if test="isDefault != null and isDefault != ''">is_default = #{isDefault},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBareboneAccessoryById" parameterType="Long">
+        delete from pms_barebone_accessory where id = #{id}
+    </delete>
+
+    <delete id="deleteByBareboneId" parameterType="Long">
+        delete from pms_barebone_accessory where barebone_id = #{bareboneId}
+    </delete>
+
+    <delete id="deleteBareboneAccessoryByIds" parameterType="Long">
+        delete from pms_barebone_accessory where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

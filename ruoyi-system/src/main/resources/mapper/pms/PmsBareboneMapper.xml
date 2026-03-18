@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.pms.mapper.PmsBareboneMapper">
+
+    <resultMap type="com.ruoyi.system.pms.domain.PmsBarebone" id="PmsBareboneResult">
+        <id     property="bareboneId"     column="barebone_id"     />
+        <result property="supplierId"     column="supplier_id"     />
+        <result property="modelName"      column="model_name"      />
+        <result property="seriesName"     column="series_name"     />
+        <result property="cpuSpec"        column="cpu_spec"        />
+        <result property="screenSpec"     column="screen_spec"     />
+        <result property="color"          column="color"           />
+        <result property="basePriceUsd"   column="base_price_usd"  />
+        <result property="status"         column="status"          />
+        <result property="createBy"       column="create_by"       />
+        <result property="createTime"     column="create_time"     />
+        <result property="updateBy"       column="update_by"       />
+        <result property="updateTime"     column="update_time"     />
+        <result property="remark"         column="remark"          />
+        <result property="supplierName"   column="supplier_name"   />
+    </resultMap>
+
+    <sql id="selectBareboneVo">
+        select b.barebone_id, b.supplier_id, b.model_name, b.series_name, b.cpu_spec, b.screen_spec, b.color, b.base_price_usd, b.status, b.create_by, b.create_time, b.update_by, b.update_time, b.remark,
+               s.supplier_name
+        from pms_barebone b
+        left join pms_supplier s on b.supplier_id = s.supplier_id
+    </sql>
+
+    <select id="selectBareboneById" parameterType="Long" resultMap="PmsBareboneResult">
+        <include refid="selectBareboneVo"/>
+        where b.barebone_id = #{bareboneId}
+    </select>
+
+    <select id="selectBareboneList" parameterType="com.ruoyi.system.pms.domain.PmsBarebone" resultMap="PmsBareboneResult">
+        <include refid="selectBareboneVo"/>
+        <where>
+            <if test="supplierId != null">
+                AND b.supplier_id = #{supplierId}
+            </if>
+            <if test="modelName != null and modelName != ''">
+                AND b.model_name like concat('%', #{modelName}, '%')
+            </if>
+            <if test="seriesName != null and seriesName != ''">
+                AND b.series_name like concat('%', #{seriesName}, '%')
+            </if>
+            <if test="cpuSpec != null and cpuSpec != ''">
+                AND b.cpu_spec like concat('%', #{cpuSpec}, '%')
+            </if>
+            <if test="color != null and color != ''">
+                AND b.color like concat('%', #{color}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND b.status = #{status}
+            </if>
+        </where>
+        order by b.create_time desc
+    </select>
+
+    <select id="checkModelNameUnique" parameterType="String" resultMap="PmsBareboneResult">
+        select barebone_id, model_name from pms_barebone where model_name = #{modelName} limit 1
+    </select>
+
+    <insert id="insertBarebone" parameterType="com.ruoyi.system.pms.domain.PmsBarebone" useGeneratedKeys="true" keyProperty="bareboneId">
+        insert into pms_barebone (
+            <if test="supplierId != null">supplier_id,</if>
+            <if test="modelName != null and modelName != ''">model_name,</if>
+            <if test="seriesName != null and seriesName != ''">series_name,</if>
+            <if test="cpuSpec != null and cpuSpec != ''">cpu_spec,</if>
+            <if test="screenSpec != null and screenSpec != ''">screen_spec,</if>
+            <if test="color != null and color != ''">color,</if>
+            <if test="basePriceUsd != null">base_price_usd,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        ) values (
+            <if test="supplierId != null">#{supplierId},</if>
+            <if test="modelName != null and modelName != ''">#{modelName},</if>
+            <if test="seriesName != null and seriesName != ''">#{seriesName},</if>
+            <if test="cpuSpec != null and cpuSpec != ''">#{cpuSpec},</if>
+            <if test="screenSpec != null and screenSpec != ''">#{screenSpec},</if>
+            <if test="color != null and color != ''">#{color},</if>
+            <if test="basePriceUsd != null">#{basePriceUsd},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateBarebone" parameterType="com.ruoyi.system.pms.domain.PmsBarebone">
+        update pms_barebone
+        <set>
+            <if test="supplierId != null">supplier_id = #{supplierId},</if>
+            <if test="modelName != null and modelName != ''">model_name = #{modelName},</if>
+            <if test="seriesName != null and seriesName != ''">series_name = #{seriesName},</if>
+            <if test="cpuSpec != null and cpuSpec != ''">cpu_spec = #{cpuSpec},</if>
+            <if test="screenSpec != null and screenSpec != ''">screen_spec = #{screenSpec},</if>
+            <if test="color != null and color != ''">color = #{color},</if>
+            <if test="basePriceUsd != null">base_price_usd = #{basePriceUsd},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where barebone_id = #{bareboneId}
+    </update>
+
+    <delete id="deleteBareboneById" parameterType="Long">
+        delete from pms_barebone where barebone_id = #{bareboneId}
+    </delete>
+
+    <delete id="deleteBareboneByIds" parameterType="Long">
+        delete from pms_barebone where barebone_id in
+        <foreach item="bareboneId" collection="array" open="(" separator="," close=")">
+            #{bareboneId}
+        </foreach>
+    </delete>
+
+</mapper>

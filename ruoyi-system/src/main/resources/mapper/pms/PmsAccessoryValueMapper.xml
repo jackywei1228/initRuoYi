@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.pms.mapper.PmsAccessoryValueMapper">
+
+    <resultMap type="com.ruoyi.system.pms.domain.PmsAccessoryValue" id="PmsAccessoryValueResult">
+        <id     property="valueId"         column="value_id"         />
+        <result property="typeId"          column="type_id"          />
+        <result property="valueName"       column="value_name"       />
+        <result property="specDescription" column="spec_description" />
+        <result property="priceAddUsd"     column="price_add_usd"    />
+        <result property="sortOrder"       column="sort_order"       />
+        <result property="status"          column="status"           />
+        <result property="createBy"        column="create_by"        />
+        <result property="createTime"      column="create_time"      />
+        <result property="updateBy"        column="update_by"        />
+        <result property="updateTime"      column="update_time"      />
+    </resultMap>
+
+    <sql id="selectAccessoryValueVo">
+        select value_id, type_id, value_name, spec_description, price_add_usd, sort_order, status, create_by, create_time, update_by, update_time
+        from pms_accessory_value
+    </sql>
+
+    <select id="selectAccessoryValueById" parameterType="Long" resultMap="PmsAccessoryValueResult">
+        <include refid="selectAccessoryValueVo"/>
+        where value_id = #{valueId}
+    </select>
+
+    <select id="selectAccessoryValueList" parameterType="com.ruoyi.system.pms.domain.PmsAccessoryValue" resultMap="PmsAccessoryValueResult">
+        <include refid="selectAccessoryValueVo"/>
+        <where>
+            <if test="typeId != null">
+                AND type_id = #{typeId}
+            </if>
+            <if test="valueName != null and valueName != ''">
+                AND value_name like concat('%', #{valueName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        order by sort_order, create_time desc
+    </select>
+
+    <select id="selectByTypeId" parameterType="Long" resultMap="PmsAccessoryValueResult">
+        <include refid="selectAccessoryValueVo"/>
+        where type_id = #{typeId}
+        order by sort_order, create_time desc
+    </select>
+
+    <insert id="insertAccessoryValue" parameterType="com.ruoyi.system.pms.domain.PmsAccessoryValue" useGeneratedKeys="true" keyProperty="valueId">
+        insert into pms_accessory_value (
+            <if test="typeId != null">type_id,</if>
+            <if test="valueName != null and valueName != ''">value_name,</if>
+            <if test="specDescription != null and specDescription != ''">spec_description,</if>
+            <if test="priceAddUsd != null">price_add_usd,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        ) values (
+            <if test="typeId != null">#{typeId},</if>
+            <if test="valueName != null and valueName != ''">#{valueName},</if>
+            <if test="specDescription != null and specDescription != ''">#{specDescription},</if>
+            <if test="priceAddUsd != null">#{priceAddUsd},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateAccessoryValue" parameterType="com.ruoyi.system.pms.domain.PmsAccessoryValue">
+        update pms_accessory_value
+        <set>
+            <if test="typeId != null">type_id = #{typeId},</if>
+            <if test="valueName != null and valueName != ''">value_name = #{valueName},</if>
+            <if test="specDescription != null">spec_description = #{specDescription},</if>
+            <if test="priceAddUsd != null">price_add_usd = #{priceAddUsd},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where value_id = #{valueId}
+    </update>
+
+    <delete id="deleteAccessoryValueById" parameterType="Long">
+        delete from pms_accessory_value where value_id = #{valueId}
+    </delete>
+
+    <delete id="deleteAccessoryValueByIds" parameterType="Long">
+        delete from pms_accessory_value where value_id in
+        <foreach item="valueId" collection="array" open="(" separator="," close=")">
+            #{valueId}
+        </foreach>
+    </delete>
+
+</mapper>

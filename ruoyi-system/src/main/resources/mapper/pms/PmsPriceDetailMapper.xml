@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.pms.mapper.PmsPriceDetailMapper">
+
+    <resultMap type="com.ruoyi.system.pms.domain.PmsPriceDetail" id="PmsPriceDetailResult">
+        <id     property="detailId"     column="detail_id"     />
+        <result property="priceId"      column="price_id"      />
+        <result property="feeType"      column="fee_type"      />
+        <result property="feeName"      column="fee_name"      />
+        <result property="amountAud"    column="amount_aud"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="remark"       column="remark"        />
+        <result property="createBy"     column="create_by"     />
+        <result property="createTime"   column="create_time"   />
+    </resultMap>
+
+    <sql id="selectPriceDetailVo">
+        select detail_id, price_id, fee_type, fee_name, amount_aud, sort_order, remark, create_by, create_time
+        from pms_price_detail
+    </sql>
+
+    <select id="selectPriceDetailById" parameterType="Long" resultMap="PmsPriceDetailResult">
+        <include refid="selectPriceDetailVo"/>
+        where detail_id = #{detailId}
+    </select>
+
+    <select id="selectPriceDetailList" parameterType="com.ruoyi.system.pms.domain.PmsPriceDetail" resultMap="PmsPriceDetailResult">
+        <include refid="selectPriceDetailVo"/>
+        <where>
+            <if test="priceId != null">
+                AND price_id = #{priceId}
+            </if>
+            <if test="feeType != null and feeType != ''">
+                AND fee_type = #{feeType}
+            </if>
+            <if test="feeName != null and feeName != ''">
+                AND fee_name like concat('%', #{feeName}, '%')
+            </if>
+        </where>
+        order by sort_order, create_time
+    </select>
+
+    <select id="selectByPriceId" parameterType="Long" resultMap="PmsPriceDetailResult">
+        <include refid="selectPriceDetailVo"/>
+        where price_id = #{priceId}
+        order by sort_order, create_time
+    </select>
+
+    <insert id="insertPriceDetail" parameterType="com.ruoyi.system.pms.domain.PmsPriceDetail" useGeneratedKeys="true" keyProperty="detailId">
+        insert into pms_price_detail (
+            <if test="priceId != null">price_id,</if>
+            <if test="feeType != null and feeType != ''">fee_type,</if>
+            <if test="feeName != null and feeName != ''">fee_name,</if>
+            <if test="amountAud != null">amount_aud,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        ) values (
+            <if test="priceId != null">#{priceId},</if>
+            <if test="feeType != null and feeType != ''">#{feeType},</if>
+            <if test="feeName != null and feeName != ''">#{feeName},</if>
+            <if test="amountAud != null">#{amountAud},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        )
+    </insert>
+
+    <insert id="batchInsertPriceDetail" parameterType="java.util.List">
+        insert into pms_price_detail (price_id, fee_type, fee_name, amount_aud, sort_order, remark, create_by, create_time) values
+        <foreach item="item" collection="list" separator=",">
+            (#{item.priceId}, #{item.feeType}, #{item.feeName}, #{item.amountAud}, #{item.sortOrder}, #{item.remark}, #{item.createBy}, sysdate())
+        </foreach>
+    </insert>
+
+    <update id="updatePriceDetail" parameterType="com.ruoyi.system.pms.domain.PmsPriceDetail">
+        update pms_price_detail
+        <set>
+            <if test="priceId != null">price_id = #{priceId},</if>
+            <if test="feeType != null and feeType != ''">fee_type = #{feeType},</if>
+            <if test="feeName != null and feeName != ''">fee_name = #{feeName},</if>
+            <if test="amountAud != null">amount_aud = #{amountAud},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where detail_id = #{detailId}
+    </update>
+
+    <delete id="deletePriceDetailById" parameterType="Long">
+        delete from pms_price_detail where detail_id = #{detailId}
+    </delete>
+
+    <delete id="deleteByPriceId" parameterType="Long">
+        delete from pms_price_detail where price_id = #{priceId}
+    </delete>
+
+    <delete id="deletePriceDetailByIds" parameterType="Long">
+        delete from pms_price_detail where detail_id in
+        <foreach item="detailId" collection="array" open="(" separator="," close=")">
+            #{detailId}
+        </foreach>
+    </delete>
+
+</mapper>

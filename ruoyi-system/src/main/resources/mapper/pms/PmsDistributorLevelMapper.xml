@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.pms.mapper.PmsDistributorLevelMapper">
+
+    <resultMap type="com.ruoyi.system.pms.domain.PmsDistributorLevel" id="PmsDistributorLevelResult">
+        <id     property="levelId"       column="level_id"       />
+        <result property="levelName"     column="level_name"     />
+        <result property="discountRate"  column="discount_rate"  />
+        <result property="visibleDbp"    column="visible_dbp"    />
+        <result property="visibleRrp"    column="visible_rrp"    />
+        <result property="priority"      column="priority"       />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"        column="remark"         />
+    </resultMap>
+
+    <sql id="selectDistributorLevelVo">
+        select level_id, level_name, discount_rate, visible_dbp, visible_rrp, priority, create_by, create_time, update_by, update_time, remark
+        from pms_distributor_level
+    </sql>
+
+    <select id="selectDistributorLevelById" parameterType="Long" resultMap="PmsDistributorLevelResult">
+        <include refid="selectDistributorLevelVo"/>
+        where level_id = #{levelId}
+    </select>
+
+    <select id="selectDistributorLevelList" parameterType="com.ruoyi.system.pms.domain.PmsDistributorLevel" resultMap="PmsDistributorLevelResult">
+        <include refid="selectDistributorLevelVo"/>
+        <where>
+            <if test="levelName != null and levelName != ''">
+                AND level_name like concat('%', #{levelName}, '%')
+            </if>
+            <if test="visibleDbp != null and visibleDbp != ''">
+                AND visible_dbp = #{visibleDbp}
+            </if>
+            <if test="visibleRrp != null and visibleRrp != ''">
+                AND visible_rrp = #{visibleRrp}
+            </if>
+        </where>
+        order by priority, create_time desc
+    </select>
+
+    <select id="checkLevelNameUnique" parameterType="String" resultMap="PmsDistributorLevelResult">
+        <include refid="selectDistributorLevelVo"/>
+        where level_name = #{levelName} limit 1
+    </select>
+
+    <insert id="insertDistributorLevel" parameterType="com.ruoyi.system.pms.domain.PmsDistributorLevel" useGeneratedKeys="true" keyProperty="levelId">
+        insert into pms_distributor_level (
+            <if test="levelName != null and levelName != ''">level_name,</if>
+            <if test="discountRate != null">discount_rate,</if>
+            <if test="visibleDbp != null and visibleDbp != ''">visible_dbp,</if>
+            <if test="visibleRrp != null and visibleRrp != ''">visible_rrp,</if>
+            <if test="priority != null">priority,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        ) values (
+            <if test="levelName != null and levelName != ''">#{levelName},</if>
+            <if test="discountRate != null">#{discountRate},</if>
+            <if test="visibleDbp != null and visibleDbp != ''">#{visibleDbp},</if>
+            <if test="visibleRrp != null and visibleRrp != ''">#{visibleRrp},</if>
+            <if test="priority != null">#{priority},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateDistributorLevel" parameterType="com.ruoyi.system.pms.domain.PmsDistributorLevel">
+        update pms_distributor_level
+        <set>
+            <if test="levelName != null and levelName != ''">level_name = #{levelName},</if>
+            <if test="discountRate != null">discount_rate = #{discountRate},</if>
+            <if test="visibleDbp != null and visibleDbp != ''">visible_dbp = #{visibleDbp},</if>
+            <if test="visibleRrp != null and visibleRrp != ''">visible_rrp = #{visibleRrp},</if>
+            <if test="priority != null">priority = #{priority},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where level_id = #{levelId}
+    </update>
+
+    <delete id="deleteDistributorLevelById" parameterType="Long">
+        delete from pms_distributor_level where level_id = #{levelId}
+    </delete>
+
+    <delete id="deleteDistributorLevelByIds" parameterType="Long">
+        delete from pms_distributor_level where level_id in
+        <foreach item="levelId" collection="array" open="(" separator="," close=")">
+            #{levelId}
+        </foreach>
+    </delete>
+
+</mapper>

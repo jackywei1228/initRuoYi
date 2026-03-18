@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.pms.mapper.PmsImportRecordMapper">
+
+    <resultMap type="com.ruoyi.system.pms.domain.PmsImportRecord" id="PmsImportRecordResult">
+        <id     property="recordId"      column="record_id"      />
+        <result property="importType"    column="import_type"    />
+        <result property="fileName"      column="file_name"      />
+        <result property="filePath"      column="file_path"      />
+        <result property="fileType"      column="file_type"      />
+        <result property="totalCount"    column="total_count"    />
+        <result property="successCount"  column="success_count"  />
+        <result property="failCount"     column="fail_count"     />
+        <result property="status"        column="status"         />
+        <result property="remark"        column="remark"         />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectImportRecordVo">
+        select record_id, import_type, file_name, file_path, file_type, total_count, success_count, fail_count, status, remark, create_by, create_time
+        from pms_import_record
+    </sql>
+
+    <select id="selectImportRecordById" parameterType="Long" resultMap="PmsImportRecordResult">
+        <include refid="selectImportRecordVo"/>
+        where record_id = #{recordId}
+    </select>
+
+    <select id="selectImportRecordList" parameterType="com.ruoyi.system.pms.domain.PmsImportRecord" resultMap="PmsImportRecordResult">
+        <include refid="selectImportRecordVo"/>
+        <where>
+            <if test="importType != null and importType != ''">
+                AND import_type = #{importType}
+            </if>
+            <if test="fileName != null and fileName != ''">
+                AND file_name like concat('%', #{fileName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''">
+                AND date_format(create_time,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                AND date_format(create_time,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <insert id="insertImportRecord" parameterType="com.ruoyi.system.pms.domain.PmsImportRecord" useGeneratedKeys="true" keyProperty="recordId">
+        insert into pms_import_record (
+            <if test="importType != null and importType != ''">import_type,</if>
+            <if test="fileName != null and fileName != ''">file_name,</if>
+            <if test="filePath != null and filePath != ''">file_path,</if>
+            <if test="fileType != null and fileType != ''">file_type,</if>
+            <if test="totalCount != null">total_count,</if>
+            <if test="successCount != null">success_count,</if>
+            <if test="failCount != null">fail_count,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        ) values (
+            <if test="importType != null and importType != ''">#{importType},</if>
+            <if test="fileName != null and fileName != ''">#{fileName},</if>
+            <if test="filePath != null and filePath != ''">#{filePath},</if>
+            <if test="fileType != null and fileType != ''">#{fileType},</if>
+            <if test="totalCount != null">#{totalCount},</if>
+            <if test="successCount != null">#{successCount},</if>
+            <if test="failCount != null">#{failCount},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateImportRecord" parameterType="com.ruoyi.system.pms.domain.PmsImportRecord">
+        update pms_import_record
+        <set>
+            <if test="importType != null and importType != ''">import_type = #{importType},</if>
+            <if test="fileName != null and fileName != ''">file_name = #{fileName},</if>
+            <if test="filePath != null and filePath != ''">file_path = #{filePath},</if>
+            <if test="fileType != null and fileType != ''">file_type = #{fileType},</if>
+            <if test="totalCount != null">total_count = #{totalCount},</if>
+            <if test="successCount != null">success_count = #{successCount},</if>
+            <if test="failCount != null">fail_count = #{failCount},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where record_id = #{recordId}
+    </update>
+
+    <delete id="deleteImportRecordById" parameterType="Long">
+        delete from pms_import_record where record_id = #{recordId}
+    </delete>
+
+    <delete id="deleteImportRecordByIds" parameterType="Long">
+        delete from pms_import_record where record_id in
+        <foreach item="recordId" collection="array" open="(" separator="," close=")">
+            #{recordId}
+        </foreach>
+    </delete>
+
+</mapper>

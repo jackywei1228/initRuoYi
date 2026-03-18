@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.pms.mapper.PmsSkuAccessoryMapper">
+
+    <resultMap type="com.ruoyi.system.pms.domain.PmsSkuAccessory" id="PmsSkuAccessoryResult">
+        <id     property="id"                 column="id"                  />
+        <result property="skuId"              column="sku_id"              />
+        <result property="accessoryTypeId"    column="accessory_type_id"   />
+        <result property="accessoryValueId"   column="accessory_value_id"  />
+    </resultMap>
+
+    <sql id="selectSkuAccessoryVo">
+        select id, sku_id, accessory_type_id, accessory_value_id
+        from pms_sku_accessory
+    </sql>
+
+    <select id="selectSkuAccessoryById" parameterType="Long" resultMap="PmsSkuAccessoryResult">
+        <include refid="selectSkuAccessoryVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectSkuAccessoryList" parameterType="com.ruoyi.system.pms.domain.PmsSkuAccessory" resultMap="PmsSkuAccessoryResult">
+        <include refid="selectSkuAccessoryVo"/>
+        <where>
+            <if test="skuId != null">
+                AND sku_id = #{skuId}
+            </if>
+            <if test="accessoryTypeId != null">
+                AND accessory_type_id = #{accessoryTypeId}
+            </if>
+            <if test="accessoryValueId != null">
+                AND accessory_value_id = #{accessoryValueId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectBySkuId" parameterType="Long" resultMap="PmsSkuAccessoryResult">
+        <include refid="selectSkuAccessoryVo"/>
+        where sku_id = #{skuId}
+    </select>
+
+    <insert id="insertSkuAccessory" parameterType="com.ruoyi.system.pms.domain.PmsSkuAccessory" useGeneratedKeys="true" keyProperty="id">
+        insert into pms_sku_accessory (
+            sku_id,
+            accessory_type_id,
+            accessory_value_id
+        ) values (
+            #{skuId},
+            #{accessoryTypeId},
+            #{accessoryValueId}
+        )
+    </insert>
+
+    <insert id="batchInsertSkuAccessory" parameterType="java.util.List">
+        insert into pms_sku_accessory (sku_id, accessory_type_id, accessory_value_id) values
+        <foreach item="item" collection="list" separator=",">
+            (#{item.skuId}, #{item.accessoryTypeId}, #{item.accessoryValueId})
+        </foreach>
+    </insert>
+
+    <update id="updateSkuAccessory" parameterType="com.ruoyi.system.pms.domain.PmsSkuAccessory">
+        update pms_sku_accessory
+        <set>
+            <if test="skuId != null">sku_id = #{skuId},</if>
+            <if test="accessoryTypeId != null">accessory_type_id = #{accessoryTypeId},</if>
+            <if test="accessoryValueId != null">accessory_value_id = #{accessoryValueId},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSkuAccessoryById" parameterType="Long">
+        delete from pms_sku_accessory where id = #{id}
+    </delete>
+
+    <delete id="deleteBySkuId" parameterType="Long">
+        delete from pms_sku_accessory where sku_id = #{skuId}
+    </delete>
+
+    <delete id="deleteSkuAccessoryByIds" parameterType="Long">
+        delete from pms_sku_accessory where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

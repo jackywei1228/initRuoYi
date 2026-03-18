@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.pms.mapper.PmsPriceMainMapper">
+
+    <resultMap type="com.ruoyi.system.pms.domain.PmsPriceMain" id="PmsPriceMainResult">
+        <id     property="priceId"               column="price_id"               />
+        <result property="skuId"                 column="sku_id"                 />
+        <result property="supplierBasePriceUsd"  column="supplier_base_price_usd"/>
+        <result property="exchangeRateUsdAud"    column="exchange_rate"          />
+        <result property="totalCostAud"          column="total_cost_aud"         />
+        <result property="dbpExAud"              column="dbp_ex_aud"             />
+        <result property="profitAud"             column="profit_aud"             />
+        <result property="rrpIncAud"             column="rrp_inc_aud"            />
+        <result property="buildMargin"           column="build_margin"           />
+        <result property="rrpMargin"             column="rrp_margin"             />
+        <result property="effectiveDate"         column="effective_date"         />
+        <result property="version"               column="version"                />
+        <result property="status"                column="status"                 />
+        <result property="createBy"              column="create_by"              />
+        <result property="createTime"            column="create_time"            />
+        <result property="updateBy"              column="update_by"              />
+        <result property="updateTime"            column="update_time"            />
+        <result property="skuCode"               column="sku_code"               />
+        <result property="configDescription"     column="config_description"     />
+        <result property="modelName"             column="model_name"             />
+        <result property="supplierName"          column="supplier_name"          />
+    </resultMap>
+
+    <sql id="selectPriceMainVo">
+        select p.price_id, p.sku_id, p.supplier_base_price_usd, p.exchange_rate, p.total_cost_aud, p.dbp_ex_aud, p.profit_aud, p.rrp_inc_aud, p.build_margin, p.rrp_margin, p.effective_date, p.version, p.status, p.create_by, p.create_time, p.update_by, p.update_time,
+               s.sku_code, s.config_description, b.model_name, sp.supplier_name
+        from pms_price_main p
+        left join pms_sku s on p.sku_id = s.sku_id
+        left join pms_barebone b on s.barebone_id = b.barebone_id
+        left join pms_supplier sp on b.supplier_id = sp.supplier_id
+    </sql>
+
+    <select id="selectPriceMainById" parameterType="Long" resultMap="PmsPriceMainResult">
+        <include refid="selectPriceMainVo"/>
+        where p.price_id = #{priceId}
+    </select>
+
+    <select id="selectPriceMainList" parameterType="com.ruoyi.system.pms.domain.PmsPriceMain" resultMap="PmsPriceMainResult">
+        <include refid="selectPriceMainVo"/>
+        <where>
+            <if test="skuId != null">
+                AND p.sku_id = #{skuId}
+            </if>
+            <if test="status != null and status != ''">
+                AND p.status = #{status}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''">
+                AND date_format(p.effective_date,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                AND date_format(p.effective_date,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+            </if>
+        </where>
+        order by p.effective_date desc, p.create_time desc
+    </select>
+
+    <select id="selectBySkuId" parameterType="Long" resultMap="PmsPriceMainResult">
+        <include refid="selectPriceMainVo"/>
+        where p.sku_id = #{skuId}
+        order by p.effective_date desc, p.version desc
+    </select>
+
+    <insert id="insertPriceMain" parameterType="com.ruoyi.system.pms.domain.PmsPriceMain" useGeneratedKeys="true" keyProperty="priceId">
+        insert into pms_price_main (
+            <if test="skuId != null">sku_id,</if>
+            <if test="supplierBasePriceUsd != null">supplier_base_price_usd,</if>
+            <if test="exchangeRateUsdAud != null">exchange_rate,</if>
+            <if test="totalCostAud != null">total_cost_aud,</if>
+            <if test="dbpExAud != null">dbp_ex_aud,</if>
+            <if test="profitAud != null">profit_aud,</if>
+            <if test="rrpIncAud != null">rrp_inc_aud,</if>
+            <if test="buildMargin != null">build_margin,</if>
+            <if test="rrpMargin != null">rrp_margin,</if>
+            <if test="effectiveDate != null">effective_date,</if>
+            <if test="version != null">version,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        ) values (
+            <if test="skuId != null">#{skuId},</if>
+            <if test="supplierBasePriceUsd != null">#{supplierBasePriceUsd},</if>
+            <if test="exchangeRateUsdAud != null">#{exchangeRateUsdAud},</if>
+            <if test="totalCostAud != null">#{totalCostAud},</if>
+            <if test="dbpExAud != null">#{dbpExAud},</if>
+            <if test="profitAud != null">#{profitAud},</if>
+            <if test="rrpIncAud != null">#{rrpIncAud},</if>
+            <if test="buildMargin != null">#{buildMargin},</if>
+            <if test="rrpMargin != null">#{rrpMargin},</if>
+            <if test="effectiveDate != null">#{effectiveDate},</if>
+            <if test="version != null">#{version},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updatePriceMain" parameterType="com.ruoyi.system.pms.domain.PmsPriceMain">
+        update pms_price_main
+        <set>
+            <if test="skuId != null">sku_id = #{skuId},</if>
+            <if test="supplierBasePriceUsd != null">supplier_base_price_usd = #{supplierBasePriceUsd},</if>
+            <if test="exchangeRateUsdAud != null">exchange_rate = #{exchangeRateUsdAud},</if>
+            <if test="totalCostAud != null">total_cost_aud = #{totalCostAud},</if>
+            <if test="dbpExAud != null">dbp_ex_aud = #{dbpExAud},</if>
+            <if test="profitAud != null">profit_aud = #{profitAud},</if>
+            <if test="rrpIncAud != null">rrp_inc_aud = #{rrpIncAud},</if>
+            <if test="buildMargin != null">build_margin = #{buildMargin},</if>
+            <if test="rrpMargin != null">rrp_margin = #{rrpMargin},</if>
+            <if test="effectiveDate != null">effective_date = #{effectiveDate},</if>
+            <if test="version != null">version = #{version},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where price_id = #{priceId}
+    </update>
+
+    <delete id="deletePriceMainById" parameterType="Long">
+        delete from pms_price_main where price_id = #{priceId}
+    </delete>
+
+    <delete id="deletePriceMainByIds" parameterType="Long">
+        delete from pms_price_main where price_id in
+        <foreach item="priceId" collection="array" open="(" separator="," close=")">
+            #{priceId}
+        </foreach>
+    </delete>
+
+</mapper>

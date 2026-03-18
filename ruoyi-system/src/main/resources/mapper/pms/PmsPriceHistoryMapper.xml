@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.pms.mapper.PmsPriceHistoryMapper">
+
+    <resultMap type="com.ruoyi.system.pms.domain.PmsPriceHistory" id="PmsPriceHistoryResult">
+        <id     property="historyId"     column="history_id"     />
+        <result property="priceId"       column="price_id"       />
+        <result property="changeType"    column="change_type"    />
+        <result property="beforeData"    column="before_data"    />
+        <result property="afterData"     column="after_data"     />
+        <result property="changeReason"  column="change_reason"  />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectPriceHistoryVo">
+        select history_id, price_id, change_type, before_data, after_data, change_reason, create_by, create_time
+        from pms_price_history
+    </sql>
+
+    <select id="selectPriceHistoryById" parameterType="Long" resultMap="PmsPriceHistoryResult">
+        <include refid="selectPriceHistoryVo"/>
+        where history_id = #{historyId}
+    </select>
+
+    <select id="selectPriceHistoryList" parameterType="com.ruoyi.system.pms.domain.PmsPriceHistory" resultMap="PmsPriceHistoryResult">
+        <include refid="selectPriceHistoryVo"/>
+        <where>
+            <if test="priceId != null">
+                AND price_id = #{priceId}
+            </if>
+            <if test="changeType != null and changeType != ''">
+                AND change_type = #{changeType}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''">
+                AND date_format(create_time,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                AND date_format(create_time,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectByPriceId" parameterType="Long" resultMap="PmsPriceHistoryResult">
+        <include refid="selectPriceHistoryVo"/>
+        where price_id = #{priceId}
+        order by create_time desc
+    </select>
+
+    <insert id="insertPriceHistory" parameterType="com.ruoyi.system.pms.domain.PmsPriceHistory" useGeneratedKeys="true" keyProperty="historyId">
+        insert into pms_price_history (
+            <if test="priceId != null">price_id,</if>
+            <if test="changeType != null and changeType != ''">change_type,</if>
+            <if test="beforeData != null and beforeData != ''">before_data,</if>
+            <if test="afterData != null and afterData != ''">after_data,</if>
+            <if test="changeReason != null and changeReason != ''">change_reason,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        ) values (
+            <if test="priceId != null">#{priceId},</if>
+            <if test="changeType != null and changeType != ''">#{changeType},</if>
+            <if test="beforeData != null and beforeData != ''">#{beforeData},</if>
+            <if test="afterData != null and afterData != ''">#{afterData},</if>
+            <if test="changeReason != null and changeReason != ''">#{changeReason},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        )
+    </insert>
+
+    <update id="updatePriceHistory" parameterType="com.ruoyi.system.pms.domain.PmsPriceHistory">
+        update pms_price_history
+        <set>
+            <if test="priceId != null">price_id = #{priceId},</if>
+            <if test="changeType != null and changeType != ''">change_type = #{changeType},</if>
+            <if test="beforeData != null and beforeData != ''">before_data = #{beforeData},</if>
+            <if test="afterData != null and afterData != ''">after_data = #{afterData},</if>
+            <if test="changeReason != null and changeReason != ''">change_reason = #{changeReason},</if>
+        </set>
+        where history_id = #{historyId}
+    </update>
+
+    <delete id="deletePriceHistoryById" parameterType="Long">
+        delete from pms_price_history where history_id = #{historyId}
+    </delete>
+
+    <delete id="deletePriceHistoryByIds" parameterType="Long">
+        delete from pms_price_history where history_id in
+        <foreach item="historyId" collection="array" open="(" separator="," close=")">
+            #{historyId}
+        </foreach>
+    </delete>
+
+</mapper>
